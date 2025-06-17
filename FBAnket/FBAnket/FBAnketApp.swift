@@ -7,13 +7,17 @@
 
 import SwiftUI
 import Firebase
+import GoogleMobileAds
 
 @main
 struct FBAnketApp: App {
     
     init() {
-            FirebaseApp.configure()
+        FirebaseApp.configure()
+        MobileAds.shared.start { status in
+            print("AdMob başlatıldı. Status: \(status)")
         }
+    }
     
     var body: some Scene {
         WindowGroup {

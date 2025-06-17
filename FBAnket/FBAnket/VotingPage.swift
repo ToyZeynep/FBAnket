@@ -43,93 +43,107 @@ struct VotingPage: View {
                 )
                 .ignoresSafeArea()
             }
-            
-            VStack(spacing: 30) {
-                HStack {
+            VStack {
+                VStack(spacing: 30) {
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            loadVotes()
+                            fetchRemoteConfig()
+                        }) {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                        }
+                        .padding(.trailing)
+                    }
                     Spacer()
-                    Button(action: {
-                        loadVotes()
-                        fetchRemoteConfig()
-                    }) {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.title3)
-                            .foregroundColor(.blue)
-                    }
-                    .padding(.trailing)
-                }
-                Spacer()
-                Text("ALİ KOÇ")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                    .cornerRadius(10)
-                
-                HStack(spacing: 40) {
-                    VStack {
-                        Image(systemName: "hand.thumbsup.fill")
-                            .font(.title2)
-                            .foregroundColor(.green)
-                        Text("\(likeCount)")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                    }
+                    Text("ALİ KOÇ")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                        .cornerRadius(10)
                     
-                    VStack {
-                        Image(systemName: "hand.thumbsdown.fill")
-                            .font(.title2)
-                            .foregroundColor(.red)
-                        Text("\(dislikeCount)")
-                            .font(.headline)
-                            .fontWeight(.semibold)
+                    HStack(spacing: 40) {
+                        VStack {
+                            Image(systemName: "hand.thumbsup.fill")
+                                .font(.title2)
+                                .foregroundColor(.green)
+                            Text("\(likeCount)")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        
+                        VStack {
+                            Image(systemName: "hand.thumbsdown.fill")
+                                .font(.title2)
+                                .foregroundColor(.red)
+                            Text("\(dislikeCount)")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
                     }
+                    .padding()
+                    .cornerRadius(12)
+                    
+                    HStack(spacing: 20) {
+                        Button(action: {
+                            handleVote(.like)
+                        }) {
+                            HStack {
+                                Image(systemName: userVote == .like ? "hand.thumbsup.fill" : "hand.thumbsup")
+                                Text("Devam Etsin")
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(userVote == .like ? Color.green : Color.green.opacity(0.2))
+                            .foregroundColor(userVote == .like ? .white : .green)
+                            .cornerRadius(10)
+                        }
+                        .disabled(isLoading || userVote == .like)
+                        
+                        Button(action: {
+                            handleVote(.dislike)
+                        }) {
+                            HStack {
+                                Image(systemName: userVote == .dislike ? "hand.thumbsdown.fill" : "hand.thumbsdown")
+                                Text("İstifa Etsin")
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(userVote == .dislike ? Color.red : Color.red.opacity(0.2))
+                            .foregroundColor(userVote == .dislike ? .white : .red)
+                            .cornerRadius(10)
+                        }
+                        .disabled(isLoading || userVote == .dislike)
+                    }
+                    .padding(.horizontal)
+                    Spacer()
                 }
                 .padding()
-                .cornerRadius(12)
                 
-                HStack(spacing: 20) {
-                    Button(action: {
-                        handleVote(.like)
-                    }) {
-                        HStack {
-                            Image(systemName: userVote == .like ? "hand.thumbsup.fill" : "hand.thumbsup")
-                            Text("Devam Etsin")
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(userVote == .like ? Color.green : Color.green.opacity(0.2))
-                        .foregroundColor(userVote == .like ? .white : .green)
-                        .cornerRadius(10)
-                    }
-                    .disabled(isLoading || userVote == .like)
-                    
-                    Button(action: {
-                        handleVote(.dislike)
-                    }) {
-                        HStack {
-                            Image(systemName: userVote == .dislike ? "hand.thumbsdown.fill" : "hand.thumbsdown")
-                            Text("İstifa Etsin")
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(userVote == .dislike ? Color.red : Color.red.opacity(0.2))
-                        .foregroundColor(userVote == .dislike ? .white : .red)
-                        .cornerRadius(10)
-                    }
-                    .disabled(isLoading || userVote == .dislike)
-                }
-                .padding(.horizontal)
-                Spacer()
                 BannerAdView()
-                .frame(height: 50)
+                .frame(height: 90)
             }
-            .padding()
             .onAppear {
                 loadVotes()
                 setupRemoteConfig()
                 fetchRemoteConfig()
             }
         }
+    }
+    
+    struct BannerAdView: UIViewRepresentable {
+        func makeUIView(context: Context) -> BannerView {
+            let banner = BannerView(adSize: AdSizeBanner)
+            banner.adUnitID = "ca-app-pub-7359263265391774/2481017005"
+            banner.rootViewController = UIApplication.shared.windows.first?.rootViewController
+            banner.load(Request())
+            return banner
+        }
+        
+        func updateUIView(_ uiView: BannerView, context: Context) {}
     }
     
     private func handleVote(_ voteType: VoteType) {
